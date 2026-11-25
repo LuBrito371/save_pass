@@ -7,18 +7,18 @@ import 'package:save_pass/ui/text_styles.dart';
 import 'package:provider/provider.dart';
 
 class PasswordListTile extends StatefulWidget {
-  PasswordListTile({super.key, required this.passwordService});
+  const PasswordListTile({super.key, required this.passwordService});
 
-  PasswordModel passwordService;
+  final PasswordModel passwordService;
   @override
   State<PasswordListTile> createState() => _PasswordListTileState();
 }
 
 class _PasswordListTileState extends State<PasswordListTile> {
   bool isPasswordVisible = false;
-  late final String username;
-  late final String password;
-  late final String service;
+  late String username;
+  late String password;
+  late String service;
 
   @override
   void initState() {
@@ -38,19 +38,25 @@ class _PasswordListTileState extends State<PasswordListTile> {
           leadingActions: [
             SwipeAction(
               title: 'Edit',
-              color: Colors.amber,
+              color: AppColors.accent,
               onTap: (handler) async {
                 await handler(false); // To close the cell
-                Navigator.pushNamed(context, '/new_password',
-                        arguments: widget.passwordService)
-                    .then((value) {
-                  if (value != null) {
+                if (!context.mounted) return;
+                Navigator.pushNamed(
+                  context,
+                  '/new_password',
+                  arguments: PasswordModel(
+                    serviceName: service,
+                    username: username,
+                    password: password,
+                  ),
+                ).then((value) {
+                  if (value != null && mounted) {
                     final newPassword = value as PasswordModel;
                     setState(() {
                       username = newPassword.username;
                       password = newPassword.password;
                       service = newPassword.serviceName;
-                      widget.passwordService = newPassword;
                     });
                   }
                 });
@@ -62,6 +68,7 @@ class _PasswordListTileState extends State<PasswordListTile> {
               title: 'Delete',
               onTap: (CompletionHandler handler) async {
                 await handler(true);
+                if (!context.mounted) return;
                 context
                     .read<SQlitePasswordController>()
                     .deletePassword(widget.passwordService);
@@ -81,7 +88,7 @@ class _PasswordListTileState extends State<PasswordListTile> {
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                       colors: [
-                        AppColors.primary.withOpacity(0.2),
+                        AppColors.primary.withValues(alpha: 0.25),
                         AppColors.black800,
                       ],
                     )
@@ -95,7 +102,7 @@ class _PasswordListTileState extends State<PasswordListTile> {
                 icon: Icon(
                   isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   color:
-                      isPasswordVisible ? AppColors.primary : AppColors.gray500,
+                      isPasswordVisible ? AppColors.accent : AppColors.gray500,
                 ),
                 onPressed: () {
                   setState(() {
@@ -115,7 +122,7 @@ class _PasswordListTileState extends State<PasswordListTile> {
               subtitle: AnimatedDefaultTextStyle(
                 style: AppTextStyle.subtitle2.copyWith(
                   color:
-                      isPasswordVisible ? AppColors.primary : AppColors.gray500,
+                      isPasswordVisible ? AppColors.accent : AppColors.gray500,
                   fontSize: isPasswordVisible ? 16 : 14,
                 ),
                 duration: const Duration(milliseconds: 300),

@@ -1,4 +1,5 @@
 import 'package:save_pass/src/model/password_model.dart';
+import 'package:save_pass/src/model/repository/app_database.dart';
 import 'package:save_pass/src/model/repository/interface/i_password_repository.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -39,6 +40,7 @@ class SQlitePasswordRepository implements IPasswordRepository {
     );
   }
 
+  @override
   Future<void> updatePassword(PasswordModel password) async {
     await database.update(
       'passwords',
@@ -54,17 +56,7 @@ class SQlitePasswordRepository implements IPasswordRepository {
     return result.map((json) => PasswordModel.fromJson(json)).toList();
   }
 
-  static Future<Database> open() async {
-    return openDatabase(
-      'passwords.db',
-      version: 1,
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE passwords(service_name TEXT PRIMARY KEY, username TEXT, password TEXT)',
-        );
-      },
-    );
-  }
+  static Future<Database> open() => AppDatabase.open();
 
   static Future<void> delete() async {
     await deleteDatabase('passwords.db');

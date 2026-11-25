@@ -1,25 +1,36 @@
 import 'package:flutter/foundation.dart';
 import 'package:save_pass/src/model/password_model.dart';
+import 'package:save_pass/src/model/repository/interface/i_password_repository.dart';
 import 'package:save_pass/src/model/repository/sqlite_password_respository.dart';
 
 class SQlitePasswordController extends ChangeNotifier {
-  late final SQlitePasswordRepository _passwordRepository;
+  IPasswordRepository? _passwordRepository;
+  SQlitePasswordRepository? _sqliteRepository;
   final List<PasswordModel> _passwords = [];
   List<PasswordModel> filteredPasswords = [];
 
-  SQlitePasswordController() {
-    SQlitePasswordRepository.open().then((database) {
-      _passwordRepository = SQlitePasswordRepository(database);
-      _passwordRepository.getAllPasswords().then((passwords) {
-        _passwords.addAll(passwords);
-        notifyListeners();
-      });
-    });
+  SQlitePasswordController({IPasswordRepository? repository}) {
+    _passwordRepository = repository;
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    if (_passwordRepository == null) {
+      final database = await SQlitePasswordRepository.open();
+      _sqliteRepository = SQlitePasswordRepository(database);
+      _passwordRepository = _sqliteRepository;
+    }
+    final passwords = await _passwordRepository!.getAllPasswords();
+    _passwords.addAll(passwords);
+    notifyListeners();
   }
 
   @override
   void dispose() {
-    SQlitePasswordRepository.close(_passwordRepository.database);
+    final repo = _sqliteRepository;
+    if (repo != null) {
+      SQlitePasswordRepository.close(repo.database);
+    }
     _passwords.clear();
     super.dispose();
   }
@@ -27,19 +38,25 @@ class SQlitePasswordController extends ChangeNotifier {
   List<PasswordModel> get passwords => _passwords;
 
   Future<void> addPassword(PasswordModel password) async {
-    await _passwordRepository.savePassword(password);
+    final repo = _passwordRepository;
+    if (repo == null) return;
+    await repo.savePassword(password);
     _passwords.add(password);
     notifyListeners();
   }
 
   Future<void> deletePassword(PasswordModel password) async {
-    await _passwordRepository.deletePassword(password.serviceName);
+    final repo = _passwordRepository;
+    if (repo == null) return;
+    await repo.deletePassword(password.serviceName);
     _passwords.remove(password);
     notifyListeners();
   }
 
   Future<void> updatePassword(PasswordModel password) async {
-    await _passwordRepository.updatePassword(password);
+    final repo = _passwordRepository;
+    if (repo == null) return;
+    await repo.updatePassword(password);
     _passwords.removeWhere((p) => p.serviceName == password.serviceName);
     _passwords.add(password);
     notifyListeners();

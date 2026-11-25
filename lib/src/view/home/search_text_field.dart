@@ -34,7 +34,7 @@ class SearchTextField extends StatelessWidget {
           ),
           Container(
             decoration: const BoxDecoration(
-              color: Colors.amber,
+              color: AppColors.accent,
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(4),
                 bottomRight: Radius.circular(4),

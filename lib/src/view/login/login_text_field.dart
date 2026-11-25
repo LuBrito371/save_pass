@@ -24,7 +24,7 @@ class LoginTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextFormField(
-        cursorColor: AppColors.primary,
+        cursorColor: AppColors.accent,
         style: AppTextStyle.bodyText1,
         controller: controller,
         obscureText: obscureText,
@@ -38,9 +38,11 @@ class LoginTextField extends StatelessWidget {
           hintStyle: AppTextStyle.bodyText1.copyWith(color: AppColors.gray500),
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8)),
-            borderSide: BorderSide(color: AppColors.primary, width: 2.0),
+            borderSide: BorderSide(color: AppColors.accent, width: 2.0),
           ),
-          border: const OutlineInputBorder(),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+          ),
         ),
       ),
     );

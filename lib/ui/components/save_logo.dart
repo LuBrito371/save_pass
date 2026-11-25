@@ -25,7 +25,7 @@ class SavePassLogo extends StatelessWidget {
               TextSpan(
                 text: 'PASS',
                 style: GoogleFonts.roboto(
-                  color: AppColors.primary,
+                  color: AppColors.accent,
                   fontSize: 48,
                   fontWeight: AppFontWeight.bold,
                 ),
@@ -35,7 +35,7 @@ class SavePassLogo extends StatelessWidget {
         ),
         const Icon(
           Icons.lock,
-          color: AppColors.primary,
+          color: AppColors.accent,
           size: 48,
         ),
       ],

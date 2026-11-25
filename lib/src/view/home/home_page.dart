@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:save_pass/src/controller/sqlite_password_controller.dart';
+import 'package:save_pass/src/controller/sqlite_profile_controller.dart';
 import 'package:save_pass/src/view/home/password_list_tile.dart';
 import 'package:save_pass/src/view/home/search_text_field.dart';
 import 'package:save_pass/ui/colors.dart';
@@ -15,6 +16,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  String _getInitials(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return 'US';
+
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    if (trimmed.length >= 2) {
+      return trimmed.substring(0, 2).toUpperCase();
+    }
+    return trimmed.toUpperCase();
+  }
 
   Widget background() {
     return Column(
@@ -33,48 +54,81 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget header(BuildContext context) {
+    final profileName = context.watch<SQliteProfileController>().profile?.name;
+    final displayName =
+        (profileName != null && profileName.trim().isNotEmpty)
+            ? profileName.trim()
+            : 'Usuário';
+    final initials = _getInitials(displayName);
+
     return SizedBox(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.black900,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8),
-                  ),
-                ),
-                width: 48,
-                height: 48,
-                child: Center(
-                  child: Text(
-                    "AL",
-                    style: AppTextStyle.headline6
-                        .copyWith(color: AppColors.primary),
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                key: const Key('profile_header_button'),
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  Navigator.pushNamed(context, '/profile');
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: AppColors.black900,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(8),
+                          ),
+                        ),
+                        width: 48,
+                        height: 48,
+                        child: Center(
+                          child: Text(
+                            initials,
+                            style: AppTextStyle.headline6
+                                .copyWith(color: AppColors.accent),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text.rich(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              TextSpan(
+                                text: 'Olá, ',
+                                style: AppTextStyle.headline5,
+                                children: [
+                                  TextSpan(
+                                    text: displayName,
+                                    style: AppTextStyle.headline4,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              'Sinta-se seguro aqui',
+                              style: AppTextStyle.subtitle2
+                                  .copyWith(color: AppColors.gray200),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      text: 'Olá, ',
-                      style: AppTextStyle.headline5,
-                      children: [
-                        TextSpan(
-                            text: 'Alex Lopes', style: AppTextStyle.headline4),
-                      ],
-                    ),
-                  ),
-                  Text('Sinta-se seguro aqui', style: AppTextStyle.subtitle2),
-                ],
-              ),
-            ],
+            ),
           ),
+          const SizedBox(width: 12),
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.white),

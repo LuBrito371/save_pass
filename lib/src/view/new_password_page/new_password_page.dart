@@ -133,7 +133,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                           .read<SQlitePasswordController>()
                           .addPassword(newPassword);
                     }
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     Navigator.pop(context, isEdit ? newPassword : null);
                   }
                 },

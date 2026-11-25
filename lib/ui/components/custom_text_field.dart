@@ -12,6 +12,10 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
     this.onChanged,
+    this.validator,
+    this.keyboardType,
+    this.textInputAction,
+    this.autovalidateMode,
   });
 
   final String hintText;
@@ -20,29 +24,67 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffix;
   final BorderRadius borderRadius;
   final void Function(String)? onChanged;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final AutovalidateMode? autovalidateMode;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 62,
-      decoration: BoxDecoration(
-        color: AppColors.black800,
-        borderRadius: borderRadius,
-      ),
-      child: TextFormField(
-        cursorColor: AppColors.primary,
-        style: AppTextStyle.bodyText1,
-        controller: controller,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          suffixIcon: suffix,
-          hintText: hintText,
-          hintStyle: AppTextStyle.bodyText1.copyWith(color: AppColors.gray500),
-          border: const OutlineInputBorder(),
-          focusedBorder: const OutlineInputBorder(),
+    return TextFormField(
+      cursorColor: AppColors.accent,
+      style: AppTextStyle.bodyText1,
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      autovalidateMode: autovalidateMode,
+      validator: validator,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColors.black800,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 18,
         ),
-        onChanged: onChanged,
+        suffixIcon: suffix,
+        hintText: hintText,
+        hintStyle: AppTextStyle.bodyText1.copyWith(color: AppColors.gray500),
+        errorStyle: AppTextStyle.caption.copyWith(color: AppColors.red),
+        border: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: BorderSide(
+            color: AppColors.gray500.withValues(alpha: 0.25),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: const BorderSide(
+            color: AppColors.accent,
+            width: 1.5,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: const BorderSide(
+            color: AppColors.red,
+            width: 1.5,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: const BorderSide(
+            color: AppColors.red,
+            width: 2,
+          ),
+        ),
       ),
+      onChanged: onChanged,
     );
   }
 }
